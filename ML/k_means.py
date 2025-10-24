@@ -38,7 +38,7 @@ class KMeans:
             # X[:, np.newaxis] (n_samples, 1, n_features)
             # Broadcasting: (n_samples, n_clusters, n_features)
             # distances: (n_samples, n_clusters)  -> distance of each sample to each centroid
-            distances = np.linalg.norm(X[:, np.newaxis] - self.centroids, axis=2)
+            distances = np.linalg.norm(X[:, None] - self.centroids, axis=2)
             # labels: (n_samples,)  -> index of nearest centroid for each sample
             labels = np.argmin(distances, axis=1)
 

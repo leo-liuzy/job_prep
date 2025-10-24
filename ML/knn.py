@@ -1,27 +1,38 @@
-class KNN:
-    def __init__(self, k=3):
-        self.k = k
+def knn_predict(X_train, y_train, x, k=3, method="argsort"):
+    """
+    最简单面试版 KNN 实现 (支持 argsort / heapq / argpartition 三种取 Top-K 方法)
+    Args:
+    X
+    _
+    train: 训练样本矩阵 [N, D]
+    y_
+    train: 标签 [N]
+    x: 单个测试样本 [D]
+    k: 近邻数量
+    method: 选择Top-K方法 ("argsort"
+    ,
+    "heapq"
+    ,
+    "argpartition")
+    """
 
-    def fit(self, X, y):
-        # KNN is a lazy learner — just store training data
-        self.X_train = np.array(X)
-        self.y_train = np.array(y)
+    # 󾠮 计 算 欧式距离 (可 以 改 成余 弦距离 等 )
+    dist = np.sqrt(np.sum((X_train - x) ** 2, axis=1))
 
-    def predict(self, X):
-        X = np.array(X)
-        predictions = [self._predict_one(x) for x in X]
-        return np.array(predictions)
+    # 󾠯 取 前 k 个 最小 距离 的 索 引
+    if method == "argsort":
+        # 完 全排 序 → O(n log n)
+        # ✅ 简 单 直 接（适 合小数据集 ）
+        idx = np.argsort(dist)[:k]
+    elif method == "heapq":
+        # 维护大小 为 k 的 最大堆 → O(n log k)
+        # ✅ 适 合大数据、 k 很小 的 情况
+        idx = heapq.nsmallest(k, range(len(dist)), key=lambda i: dist[i])
+    else:
+        raise ValueError("method must be one of ['argsort'
+'argpartition']")
 
-    def _predict_one(self, x):
-        # Compute Euclidean distances to all training samples
-        distances = np.linalg.norm(self.X_train - x, axis=1)
-        
-        # Get indices of k nearest neighbors
-        k_indices = np.argsort(distances)[:self.k]
-        
-        # Get their labels
-        k_labels = self.y_train[k_indices]
-        
-        # Majority vote
-        most_common = Counter(k_labels).most_common(1)[0][0]
-        return most_common
+    labels = y_train[idx]
+    pred = np.bincount(labels).argmax()
+
+    return pred

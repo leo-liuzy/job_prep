@@ -162,6 +162,7 @@ class GroupedQueryAttention(nn.Module):
         
         # [B, n_group, heads_per_group, T, head_dim]
         Q = Q.view(B, self.n_group, self.heads_per_group, T, self.head_dim)
+        # [B, n_group, 1, T, head_dim]
         K = K.unsqueeze(2)
         V = V.unsqueeze(2)
 
